@@ -43,7 +43,10 @@ async function carregarPlantas() {
     // Adicionar marcadores para cada planta
     plantas.forEach(planta => {
       // Verificar se a planta tem coordenadas válidas
-      if (planta.latitude && planta.longitude) {
+      if (
+  typeof planta.latitude === 'number' &&
+  typeof planta.longitude === 'number'
+) {
         const marker = L.marker([planta.latitude, planta.longitude], {
           icon: plantIcon
         }).addTo(map);
