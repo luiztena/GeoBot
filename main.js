@@ -58,7 +58,6 @@ async function carregarPlantas() {
               ${planta.nome}
             </h3>
             <p style="margin: 5px 0;"><strong>🌿 Família:</strong> ${planta.familia}</p>
-            <p style="margin: 5px 0;"><strong>📍 Local:</strong> ${planta.local}</p>
             <p style="margin: 5px 0;"><strong>📝 Descrição:</strong> ${planta.descricao}</p>
             <p style="margin: 5px 0;"><strong>👤 Coletor:</strong> ${planta.coletor}</p>
             ${planta.determinator ? `<p style="margin: 5px 0;"><strong>🧑🏽‍🔬 Determinator:</strong> ${planta.determinator}</p>` : ''}
