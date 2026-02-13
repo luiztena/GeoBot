@@ -69,6 +69,20 @@
     "latitude": -1.458077,
     "longitude": -48.435998
   },
+   {
+    "id": "gb-0005",
+    "nome": "Bougainvillea spectabilis Willd.",
+    "nome-vulgar": "Três Marias",
+    "familia": "Nyctaginaceae",
+    "descricao": "Árvore de aproximadamente 2.5 metros, características: folhas verdes com flores rosas e caule rígidos",
+    "local": "campus da UFRA, proxima a secretaria da prefeitura UFRA",
+    "coletor": "Eder, G.S.C",
+    "determinator": "OLIVEIRA, T.J.M. de",
+    "data": "2021-03-21",
+    "coordenadas": "1° 27' 34.4\" S 48° 26' 9.6\" W",
+    "latitude": -1.459556,
+    "longitude": -48.436
+  },
   {
     "id": "gb-0006",
     "nome": "Byrsonymia crassifolia (L) Kunth",
@@ -539,5 +553,70 @@
     "coordenadas": "1°27'19.2\" S 48°26'18.9\" W",
     "latitude": -1.455333,
     "longitude": -48.438583
+  },
+  {
+    "id": "gb-0043",
+    "nome": "Vitex agnus-castus L.",
+    "nome-vulgar": "Liamba",
+    "familia": "Lamiaceae",
+    "descricao": "Arvore com aproximadamente 2 metros de altura, com flores de coloração amarela", 
+    "determinator": "COSTA, D.M",
+    "coletor": "PAMPLONA, A.B.A",
+    "data": "2023-07-10",
+    "coordenadas": "1°27'19.2\" S 48°26'18.9\" W",
+    "latitude": -1.455333,
+    "longitude": -48.438583
+  },
+  {
+    "id": "gb-0044",
+    "nome": "Virola sebifera Aubl.",
+    "nome-vulgar": ["Ucuúba do cerrado", "Ucuúba"],
+    "familia": "Myristecaceae",
+    "descricao": "Arvore com aproximadamente 3 metros de altura, com flores de coloração marrom", 
+    "determinator": "NASCIMENTO, M.E. do",
+    "coletor": "MARQUES, I.S. da",
+    "data": "2023-05-12",
+    "coordenadas": "1°27'22.7\" S 48°26'12.7\" W",
+    "latitude": -1.456306,
+    "longitude": -48.436861
+  },
+  {
+    "id": "gb-0045",
+    "nome": "Engenia malaccensis  L.",
+    "nome-vulgar": ["Jambeiro", "Jambo"],
+    "familia": "Myrtaceae",
+    "descricao": "Arvore com aproximadamente 8.5 metros de altura, com flores de coloração rosa", 
+    "determinator": "NASCIMENTO, M.E. do",
+    "coletor": "Pantoja, L.M",
+    "data": "2023-07-12",
+    "coordenadas": "1°27'28.4\" S 48°26'0\" W",
+    "latitude": -1.457889,
+    "longitude": -48.433333
+  },
+  {
+    "id": "gb-0046",
+    "nome": "Psidium guajava L.",
+    "nome-vulgar": ["Goiaba", "Goiabeira"],
+    "familia": "Myrtaceae",
+    "descricao": "Arvore com aproximadamente 5 metros de altura, com flores de coloração branca", 
+    "determinator": "NASCIMENTO, M.E. do",
+    "coletor": "Assis, L.F.C.T. de",
+    "data": "2018-06-11",
+    "coordenadas": "1°27'26.62\" S 48°26'6.46\" W",
+    "latitude": -1.457394,
+    "longitude": -48.435128
+  },
+  {
+    "id": "gb-0047",
+    "nome": "Psidium guajava L.",
+    "nome-vulgar": ["Goiaba", "Goiabeira"],
+    "familia": "Myrtaceae",
+    "descricao": "Arvore com aproximadamente 5 metros de altura, com flores de coloração branca", 
+    "determinator": "NASCIMENTO, M.E. do",
+    "coletor": "Assis, L.F.C.T. de",
+    "data": "2018-06-11",
+    "coordenadas": "1°27'26.62\" S 48°26'6.46\" W",
+    "latitude": -1.457394,
+    "longitude": -48.435128
   }
 ]
