@@ -282,8 +282,7 @@
     "data": "2023-07-13",
     "coordenadas": "1°27'52.1\" S 48°26'03.09\" W",
     "latitude": -1.464472,
-    "longitude": -48.434192,
-    "precisao": "levemente impreciso"
+    "longitude": -48.434192
   },
   {
     "id": "gb-0023",
@@ -400,7 +399,7 @@
     "coordenadas": "1°27'34.6\" S 48°26'28.2\" W",
     "latitude": -1.459611,
     "longitude": -48.441167,
-    "precisao": "impressiso"
+    "precisao": "levemente impreciso"
   },
   {
     "id": "gb-0038",

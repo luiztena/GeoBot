@@ -2,27 +2,319 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>GeoBot – MVP</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa Botânico - UFRA Campus Belém</title>
+  
   <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
-
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <!-- Leaflet MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+    }
+
+    /* Container do mapa */
     #map {
-      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100%;
+      height: 100vh;
+      z-index: 0;
+    }
+
+    /* Header */
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 15px 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 1000;
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: #2d5016;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: #666;
+      margin: 0;
+    }
+
+    /* Estilos dos clusters */
+    .marker-cluster-small {
+      background-color: rgba(46, 204, 113, 0.6);
+    }
+    
+    .marker-cluster-small div {
+      background-color: rgba(46, 204, 113, 0.8);
+    }
+
+    .marker-cluster-medium {
+      background-color: rgba(241, 196, 15, 0.6);
+    }
+    
+    .marker-cluster-medium div {
+      background-color: rgba(241, 196, 15, 0.8);
+    }
+
+    .marker-cluster-large {
+      background-color: rgba(231, 76, 60, 0.6);
+    }
+    
+    .marker-cluster-large div {
+      background-color: rgba(231, 76, 60, 0.8);
+    }
+
+    .marker-cluster {
+      background-clip: padding-box;
+      border-radius: 20px;
+    }
+    
+    .marker-cluster div {
+      width: 30px;
+      height: 30px;
+      margin-left: 5px;
+      margin-top: 5px;
+      text-align: center;
+      border-radius: 15px;
+      font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+      font-weight: bold;
+    }
+    
+    .marker-cluster span {
+      line-height: 30px;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    /* Botões de controle personalizados */
+    .custom-controls {
+      position: absolute;
+      top: 100px;
+      right: 10px;
+      z-index: 1000;
+    }
+
+    .control-button {
+      background: white;
+      border: none;
+      padding: 10px 15px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+      display: block;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .control-button:hover {
+      background: #f0f0f0;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+
+    .control-button:active {
+      transform: scale(0.98);
+    }
+
+    /* Popup customizado */
+    .leaflet-popup-content {
+      margin: 15px;
+      line-height: 1.6;
+    }
+
+    .leaflet-popup-content h3 {
+      font-family: 'Georgia', serif;
+    }
+
+    /* Loading spinner */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2000;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    .loading.hidden {
+      display: none;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #2d5016;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 18px;
+      }
+      
+      .header p {
+        font-size: 12px;
+      }
+
+      .leaflet-popup-content {
+        max-width: 250px !important;
+      }
+    }
+
+    /* Info box */
+    .info {
+      padding: 6px 8px;
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+
+    .info h4 {
+      margin: 0 0 5px;
+      color: #777;
+    }
+
+    /* Ajustes da legenda */
+    .legend {
+      line-height: 1.5;
+      color: #555;
+    }
+
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
 
+
+  <!-- Loading spinner -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Carregando dados do herbário...</p>
+  </div>
+
+  <!-- Controles personalizados -->
+  <div class="custom-controls">
+    <button class="control-button" onclick="voltarParaVisaoGeral()">
+      🏠 Visão Geral
+    </button>
+    <button class="control-button" onclick="toggleClusters()">
+      🔄 Toggle Clusters
+    </button>
+    <button class="control-button" onclick="toggleAreas()">
+      📍 Toggle Áreas
+    </button>
+  </div>
+
+  <!-- Mapa -->
   <div id="map"></div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Leaflet MarkerCluster JS -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- Script principal do mapa -->
   <script src="main.js"></script>
+
+  <script>
+    // Funções de controle
+    let clustersEnabled = true;
+    let areasEnabled = true;
+    let areasLayers = [];
+
+    function voltarParaVisaoGeral() {
+      map.setView([-1.4583, -48.4358], 16);
+    }
+
+    function toggleClusters() {
+      if (clustersEnabled) {
+        map.removeLayer(markers);
+        clustersEnabled = false;
+        
+        // Adicionar marcadores individuais
+        markers.eachLayer(function(layer) {
+          layer.addTo(map);
+        });
+      } else {
+        // Remover marcadores individuais
+        markers.eachLayer(function(layer) {
+          map.removeLayer(layer);
+        });
+        
+        map.addLayer(markers);
+        clustersEnabled = true;
+      }
+    }
+
+    function toggleAreas() {
+      // Esta função será implementada após o carregamento das áreas
+      console.log('Toggle áreas - funcionalidade em desenvolvimento');
+    }
+
+    // Esconder loading após carregar
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        document.getElementById('loading').classList.add('hidden');
+      }, 1000);
+    });
+
+    // Adicionar informações no console
+    console.log('%c🌿 Mapa Botânico UFRA', 'font-size: 20px; color: #2d5016; font-weight: bold;');
+    console.log('%cDesenvolvido para o Herbário do Campus Belém', 'font-size: 12px; color: #666;');
+    console.log('');
+    console.log('📊 Funcionalidades:');
+    console.log('  • Clustering de marcadores');
+    console.log('  • Visualização de áreas do campus');
+    console.log('  • Marcadores coloridos por precisão');
+    console.log('  • Popups informativos');
+    console.log('');
+  </script>
 </body>
 </html>
