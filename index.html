@@ -244,10 +244,13 @@
       🏠 Visão Geral
     </button>
     <button class="control-button" onclick="toggleClusters()">
-      🔄 Toggle Clusters
+      🔄 Desativar Clusters
     </button>
     <button class="control-button" onclick="toggleAreas()">
       📍 Toggle Áreas
+    </button>
+    <button class="control-button" onclick="mostrarEstatisticas()">
+      📊 Estatísticas
     </button>
   </div>
 
@@ -267,41 +270,90 @@
     // Funções de controle
     let clustersEnabled = true;
     let areasEnabled = true;
-    let areasLayers = [];
 
     function voltarParaVisaoGeral() {
       map.setView([-1.4583, -48.4358], 16);
     }
 
-    function toggleClusters() {
-      if (clustersEnabled) {
-        map.removeLayer(markers);
-        clustersEnabled = false;
-        
-        // Adicionar marcadores individuais
-        markers.eachLayer(function(layer) {
-          layer.addTo(map);
-        });
-      } else {
-        // Remover marcadores individuais
-        markers.eachLayer(function(layer) {
-          map.removeLayer(layer);
-        });
-        
-        map.addLayer(markers);
-        clustersEnabled = true;
-      }
-    }
+    // A função toggleClusters agora está no arquivo JavaScript principal
+    // e atualiza o texto do botão automaticamente
 
-    function toggleAreas() {
-      // Esta função será implementada após o carregamento das áreas
-      console.log('Toggle áreas - funcionalidade em desenvolvimento');
+    // A função toggleAreas também está no arquivo JavaScript principal
+
+    function mostrarEstatisticas() {
+      // Contar plantas por área
+      let dentroAreas = 0;
+      let foraAreas = 0;
+      
+      marcadoresIndividuais.forEach(marker => {
+        const latlng = marker.getLatLng();
+        let dentroDeAlgumaArea = false;
+        
+        areas.forEach(area => {
+          if (area.tipo !== 'linha') {
+            const polygon = L.polygon(area.coordenadas);
+            if (polygon.getBounds().contains(latlng)) {
+              dentroDeAlgumaArea = true;
+            }
+          }
+        });
+        
+        if (dentroDeAlgumaArea) {
+          dentroAreas++;
+        } else {
+          foraAreas++;
+        }
+      });
+      
+      const stats = `
+        <div style="text-align: left; padding: 20px; min-width: 300px;">
+          <h3 style="margin-top: 0; color: #2d5016; border-bottom: 2px solid #4a7c2c; padding-bottom: 10px;">
+            📊 Estatísticas do Mapa
+          </h3>
+          
+          <div style="background: #f0f8ff; padding: 10px; border-radius: 5px; margin: 10px 0;">
+            <strong>🌿 Plantas Catalogadas</strong><br>
+            Total: <strong>${marcadoresIndividuais.length}</strong> espécimes
+          </div>
+          
+          <div style="background: #f0fff0; padding: 10px; border-radius: 5px; margin: 10px 0;">
+            <strong>📍 Distribuição Espacial</strong><br>
+            Dentro das áreas: <strong>${dentroAreas}</strong><br>
+            Fora das áreas: <strong>${foraAreas}</strong>
+          </div>
+          
+          <div style="background: #fff8f0; padding: 10px; border-radius: 5px; margin: 10px 0;">
+            <strong>🗺️ Áreas Mapeadas</strong><br>
+            Total: <strong>${areas.length}</strong> áreas<br>
+            Polígonos: <strong>4</strong><br>
+            Trilhas: <strong>1</strong>
+          </div>
+          
+          <div style="background: #f8f8f8; padding: 10px; border-radius: 5px; margin: 10px 0;">
+            <strong>⚙️ Sistema</strong><br>
+            Clusters: <strong>${clustersAtivados ? '✅ Ativados' : '❌ Desativados'}</strong><br>
+            Áreas visíveis: <strong>${map.hasLayer(areasLayerGroup) ? '✅ Sim' : '❌ Não'}</strong>
+          </div>
+          
+          <p style="font-size: 11px; color: #666; margin-top: 15px; text-align: center;">
+            <em>Herbário UFRA Campus Belém</em>
+          </p>
+        </div>
+      `;
+      
+      L.popup()
+        .setLatLng([-1.4583, -48.4358])
+        .setContent(stats)
+        .openOn(map);
     }
 
     // Esconder loading após carregar
     window.addEventListener('load', function() {
       setTimeout(function() {
-        document.getElementById('loading').classList.add('hidden');
+        const loading = document.getElementById('loading');
+        if (loading) {
+          loading.classList.add('hidden');
+        }
       }, 1000);
     });
 
@@ -310,10 +362,16 @@
     console.log('%cDesenvolvido para o Herbário do Campus Belém', 'font-size: 12px; color: #666;');
     console.log('');
     console.log('📊 Funcionalidades:');
-    console.log('  • Clustering de marcadores');
+    console.log('  • Clustering de marcadores (ativar/desativar)');
     console.log('  • Visualização de áreas do campus');
     console.log('  • Marcadores coloridos por precisão');
     console.log('  • Popups informativos');
+    console.log('  • Estatísticas em tempo real');
+    console.log('');
+    console.log('💡 Comandos disponíveis:');
+    console.log('  toggleClusters() - Ativar/desativar agrupamento');
+    console.log('  toggleAreas() - Mostrar/ocultar áreas');
+    console.log('  mostrarEstatisticas() - Exibir estatísticas');
     console.log('');
   </script>
 </body>
