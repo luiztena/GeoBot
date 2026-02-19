@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mapa Botânico - UFRA Campus Belém</title>
-  
+
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
+
   <!-- Leaflet MarkerCluster CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-  
+
   <style>
     * {
       margin: 0;
@@ -63,11 +63,160 @@
       margin: 0;
     }
 
+    /* Painel de Pesquisa */
+    .search-panel {
+      position: absolute;
+      top: 100px;
+      left: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 1000;
+      width: 320px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+
+    .search-panel h3 {
+      color: #2d5016;
+      margin-bottom: 15px;
+      font-size: 16px;
+      border-bottom: 2px solid #4a7c2c;
+      padding-bottom: 8px;
+    }
+
+    .search-input-group {
+      margin-bottom: 12px;
+    }
+
+    .search-input-group label {
+      display: block;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .search-input-group input,
+    .search-input-group select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: border-color 0.3s;
+    }
+
+    .search-input-group input:focus,
+    .search-input-group select:focus {
+      outline: none;
+      border-color: #4a7c2c;
+    }
+
+    .search-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #4a7c2c;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #3d6624;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #555;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    /* Resultados da pesquisa */
+    .search-results {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .results-count {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .results-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .result-item {
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 3px solid #4a7c2c;
+    }
+
+    .result-item:hover {
+      background: #e8f5e9;
+      transform: translateX(3px);
+    }
+
+    .result-item strong {
+      color: #2d5016;
+      font-size: 13px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .result-item small {
+      color: #666;
+      font-size: 11px;
+    }
+
+    /* Botão toggle do painel */
+    .toggle-search {
+      position: absolute;
+      top: 100px;
+      left: 20px;
+      z-index: 999;
+      background: #4a7c2c;
+      color: white;
+      border: none;
+      padding: 12px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      display: none;
+    }
+
     /* Estilos dos clusters */
     .marker-cluster-small {
       background-color: rgba(46, 204, 113, 0.6);
     }
-    
+
     .marker-cluster-small div {
       background-color: rgba(46, 204, 113, 0.8);
     }
@@ -75,7 +224,7 @@
     .marker-cluster-medium {
       background-color: rgba(241, 196, 15, 0.6);
     }
-    
+
     .marker-cluster-medium div {
       background-color: rgba(241, 196, 15, 0.8);
     }
@@ -83,7 +232,7 @@
     .marker-cluster-large {
       background-color: rgba(231, 76, 60, 0.6);
     }
-    
+
     .marker-cluster-large div {
       background-color: rgba(231, 76, 60, 0.8);
     }
@@ -92,7 +241,7 @@
       background-clip: padding-box;
       border-radius: 20px;
     }
-    
+
     .marker-cluster div {
       width: 30px;
       height: 30px;
@@ -103,7 +252,7 @@
       font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
       font-weight: bold;
     }
-    
+
     .marker-cluster span {
       line-height: 30px;
       color: white;
@@ -189,13 +338,26 @@
       .header h1 {
         font-size: 18px;
       }
-      
+
       .header p {
         font-size: 12px;
       }
 
+      .search-panel {
+        width: calc(100% - 40px);
+        max-height: 60vh;
+        left: 10px;
+        right: 10px;
+      }
+
       .leaflet-popup-content {
         max-width: 250px !important;
+      }
+
+      .custom-controls {
+        top: auto;
+        bottom: 20px;
+        right: 10px;
       }
     }
 
@@ -227,15 +389,72 @@
       margin-right: 8px;
       opacity: 0.7;
     }
+
+    /* Destaque no marcador selecionado */
+    .marker-selected {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
   </style>
+<base target="_blank">
 </head>
 <body>
-
 
   <!-- Loading spinner -->
   <div class="loading" id="loading">
     <div class="spinner"></div>
     <p>Carregando dados do herbário...</p>
+  </div>
+
+  <!-- Botão toggle painel (mobile) -->
+  <button class="toggle-search" id="toggleSearch" onclick="toggleSearchPanel()">
+    🔍 Pesquisar
+  </button>
+
+  <!-- Painel de Pesquisa -->
+  <div class="search-panel" id="searchPanel">
+    <h3>🔍 Pesquisar Plantas</h3>
+
+    <div class="search-input-group">
+      <label for="searchNome">Nome Científico ou Comum</label>
+      <input type="text" id="searchNome" placeholder="Ex: Graviola, Annona..." onkeyup="if(event.key==='Enter') realizarPesquisa()">
+    </div>
+
+    <div class="search-input-group">
+      <label for="searchFamilia">Família</label>
+      <input type="text" id="searchFamilia" placeholder="Ex: Annonaceae..." list="familiasList" onkeyup="if(event.key==='Enter') realizarPesquisa()">
+      <datalist id="familiasList"></datalist>
+    </div>
+
+    <div class="search-input-group">
+      <label for="searchGenero">Gênero</label>
+      <input type="text" id="searchGenero" placeholder="Ex: Annona..." list="generosList" onkeyup="if(event.key==='Enter') realizarPesquisa()">
+      <datalist id="generosList"></datalist>
+    </div>
+
+    <div class="search-input-group">
+      <label for="searchDeterminador">Determinador</label>
+      <input type="text" id="searchDeterminador" placeholder="Ex: NASCIMENTO..." onkeyup="if(event.key==='Enter') realizarPesquisa()">
+    </div>
+
+    <div class="search-buttons">
+      <button class="btn btn-primary" onclick="realizarPesquisa()">
+        🔍 Buscar
+      </button>
+      <button class="btn btn-secondary" onclick="limparPesquisa()">
+        ✕ Limpar
+      </button>
+    </div>
+
+    <div class="search-results" id="searchResults" style="display: none;">
+      <div class="results-count" id="resultsCount"></div>
+      <div class="results-list" id="resultsList"></div>
+    </div>
   </div>
 
   <!-- Controles personalizados -->
@@ -259,7 +478,7 @@
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  
+
   <!-- Leaflet MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
@@ -275,6 +494,19 @@
       map.setView([-1.4583, -48.4358], 16);
     }
 
+    function toggleSearchPanel() {
+      const panel = document.getElementById('searchPanel');
+      const btn = document.getElementById('toggleSearch');
+
+      if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        btn.style.display = 'none';
+      } else {
+        panel.style.display = 'none';
+        btn.style.display = 'block';
+      }
+    }
+
     // A função toggleClusters agora está no arquivo JavaScript principal
     // e atualiza o texto do botão automaticamente
 
@@ -284,11 +516,11 @@
       // Contar plantas por área
       let dentroAreas = 0;
       let foraAreas = 0;
-      
+
       marcadoresIndividuais.forEach(marker => {
         const latlng = marker.getLatLng();
         let dentroDeAlgumaArea = false;
-        
+
         areas.forEach(area => {
           if (area.tipo !== 'linha') {
             const polygon = L.polygon(area.coordenadas);
@@ -297,50 +529,50 @@
             }
           }
         });
-        
+
         if (dentroDeAlgumaArea) {
           dentroAreas++;
         } else {
           foraAreas++;
         }
       });
-      
+
       const stats = `
         <div style="text-align: left; padding: 20px; min-width: 300px;">
           <h3 style="margin-top: 0; color: #2d5016; border-bottom: 2px solid #4a7c2c; padding-bottom: 10px;">
             📊 Estatísticas do Mapa
           </h3>
-          
+
           <div style="background: #f0f8ff; padding: 10px; border-radius: 5px; margin: 10px 0;">
             <strong>🌿 Plantas Catalogadas</strong><br>
             Total: <strong>${marcadoresIndividuais.length}</strong> espécimes
           </div>
-          
+
           <div style="background: #f0fff0; padding: 10px; border-radius: 5px; margin: 10px 0;">
             <strong>📍 Distribuição Espacial</strong><br>
             Dentro das áreas: <strong>${dentroAreas}</strong><br>
             Fora das áreas: <strong>${foraAreas}</strong>
           </div>
-          
+
           <div style="background: #fff8f0; padding: 10px; border-radius: 5px; margin: 10px 0;">
             <strong>🗺️ Áreas Mapeadas</strong><br>
             Total: <strong>${areas.length}</strong> áreas<br>
             Polígonos: <strong>4</strong><br>
             Trilhas: <strong>1</strong>
           </div>
-          
+
           <div style="background: #f8f8f8; padding: 10px; border-radius: 5px; margin: 10px 0;">
             <strong>⚙️ Sistema</strong><br>
             Clusters: <strong>${clustersAtivados ? '✅ Ativados' : '❌ Desativados'}</strong><br>
             Áreas visíveis: <strong>${map.hasLayer(areasLayerGroup) ? '✅ Sim' : '❌ Não'}</strong>
           </div>
-          
+
           <p style="font-size: 11px; color: #666; margin-top: 15px; text-align: center;">
             <em>Herbário UFRA Campus Belém</em>
           </p>
         </div>
       `;
-      
+
       L.popup()
         .setLatLng([-1.4583, -48.4358])
         .setContent(stats)
@@ -367,11 +599,14 @@
     console.log('  • Marcadores coloridos por precisão');
     console.log('  • Popups informativos');
     console.log('  • Estatísticas em tempo real');
+    console.log('  • 🔍 PESQUISA AVANÇADA por família, gênero, espécie e nome comum');
     console.log('');
     console.log('💡 Comandos disponíveis:');
     console.log('  toggleClusters() - Ativar/desativar agrupamento');
     console.log('  toggleAreas() - Mostrar/ocultar áreas');
     console.log('  mostrarEstatisticas() - Exibir estatísticas');
+    console.log('  realizarPesquisa() - Executar busca');
+    console.log('  limparPesquisa() - Limpar filtros');
     console.log('');
   </script>
 </body>
