@@ -5,42 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mapa Botânico - UFRA Campus Belém</title>
 
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-  <!-- Leaflet MarkerCluster CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      overflow: hidden;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
 
-    /* Container do mapa */
     #map {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      height: 100vh;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100vh;
       z-index: 0;
     }
 
-    /* Header */
     .header {
       position: absolute;
-      top: 20px;
-      left: 50%;
+      top: 20px; left: 50%;
       transform: translateX(-50%);
       background: white;
       padding: 15px 30px;
@@ -50,24 +33,12 @@
       text-align: center;
       max-width: 90%;
     }
+    .header h1 { font-size: 24px; color: #2d5016; margin-bottom: 5px; }
+    .header p  { font-size: 14px; color: #666; margin: 0; }
 
-    .header h1 {
-      font-size: 24px;
-      color: #2d5016;
-      margin-bottom: 5px;
-    }
-
-    .header p {
-      font-size: 14px;
-      color: #666;
-      margin: 0;
-    }
-
-    /* Painel de Pesquisa */
     .search-panel {
       position: absolute;
-      top: 100px;
-      left: 20px;
+      top: 100px; left: 20px;
       background: white;
       padding: 20px;
       border-radius: 10px;
@@ -77,7 +48,6 @@
       max-height: calc(100vh - 120px);
       overflow-y: auto;
     }
-
     .search-panel h3 {
       color: #2d5016;
       margin-bottom: 15px;
@@ -86,18 +56,12 @@
       padding-bottom: 8px;
     }
 
-    .search-input-group {
-      margin-bottom: 12px;
-    }
-
+    .search-input-group { margin-bottom: 12px; }
     .search-input-group label {
       display: block;
-      font-size: 12px;
-      color: #555;
-      margin-bottom: 4px;
-      font-weight: 600;
+      font-size: 12px; color: #555;
+      margin-bottom: 4px; font-weight: 600;
     }
-
     .search-input-group input,
     .search-input-group select {
       width: 100%;
@@ -106,67 +70,44 @@
       border-radius: 6px;
       font-size: 13px;
       transition: border-color 0.3s;
+      background: white;
     }
-
     .search-input-group input:focus,
     .search-input-group select:focus {
       outline: none;
       border-color: #4a7c2c;
     }
 
-    .search-buttons {
-      display: flex;
-      gap: 8px;
-      margin-top: 15px;
+    /* Destaque visual para o filtro de ano */
+    .search-input-group.year-filter label {
+      color: #2d5016;
+    }
+    .search-input-group.year-filter select {
+      border-color: #a8d5a2;
+      background: #f6fff6;
+      font-weight: 600;
+      color: #2d5016;
+    }
+    .search-input-group.year-filter select:focus {
+      border-color: #4a7c2c;
+      background: white;
     }
 
+    .search-buttons { display: flex; gap: 8px; margin-top: 15px; }
     .btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
+      flex: 1; padding: 10px;
+      border: none; border-radius: 6px;
+      cursor: pointer; font-size: 13px; font-weight: 600;
       transition: all 0.3s;
     }
+    .btn-primary { background: #4a7c2c; color: white; }
+    .btn-primary:hover { background: #3d6624; }
+    .btn-secondary { background: #f0f0f0; color: #555; }
+    .btn-secondary:hover { background: #e0e0e0; }
 
-    .btn-primary {
-      background: #4a7c2c;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #3d6624;
-    }
-
-    .btn-secondary {
-      background: #f0f0f0;
-      color: #555;
-    }
-
-    .btn-secondary:hover {
-      background: #e0e0e0;
-    }
-
-    /* Resultados da pesquisa */
-    .search-results {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-
-    .results-count {
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-
-    .results-list {
-      max-height: 200px;
-      overflow-y: auto;
-    }
+    .search-results { margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; }
+    .results-count { font-size: 12px; color: #666; margin-bottom: 10px; font-weight: 600; }
+    .results-list { max-height: 200px; overflow-y: auto; }
 
     .result-item {
       padding: 10px;
@@ -177,437 +118,213 @@
       transition: all 0.2s;
       border-left: 3px solid #4a7c2c;
     }
+    .result-item:hover { background: #e8f5e9; transform: translateX(3px); }
+    .result-item strong { color: #2d5016; font-size: 13px; display: block; margin-bottom: 2px; }
+    .result-item small  { color: #666; font-size: 11px; }
 
-    .result-item:hover {
+    /* Badge de ano nos resultados */
+    .ano-badge {
+      display: inline-block;
       background: #e8f5e9;
-      transform: translateX(3px);
-    }
-
-    .result-item strong {
       color: #2d5016;
-      font-size: 13px;
-      display: block;
-      margin-bottom: 2px;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 4px;
+      vertical-align: middle;
     }
 
-    .result-item small {
-      color: #666;
-      font-size: 11px;
-    }
-
-    /* Botão toggle do painel */
     .toggle-search {
-      position: absolute;
-      top: 100px;
-      left: 20px;
+      position: absolute; top: 100px; left: 20px;
       z-index: 999;
-      background: #4a7c2c;
-      color: white;
-      border: none;
-      padding: 12px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
+      background: #4a7c2c; color: white;
+      border: none; padding: 12px 15px; border-radius: 8px;
+      cursor: pointer; font-size: 14px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.3);
       display: none;
     }
 
-    /* Estilos dos clusters */
-    .marker-cluster-small {
-      background-color: rgba(46, 204, 113, 0.6);
-    }
-
-    .marker-cluster-small div {
-      background-color: rgba(46, 204, 113, 0.8);
-    }
-
-    .marker-cluster-medium {
-      background-color: rgba(241, 196, 15, 0.6);
-    }
-
-    .marker-cluster-medium div {
-      background-color: rgba(241, 196, 15, 0.8);
-    }
-
-    .marker-cluster-large {
-      background-color: rgba(231, 76, 60, 0.6);
-    }
-
-    .marker-cluster-large div {
-      background-color: rgba(231, 76, 60, 0.8);
-    }
-
-    .marker-cluster {
-      background-clip: padding-box;
-      border-radius: 20px;
-    }
-
+    /* Clusters */
+    .marker-cluster-small  { background-color: rgba(46,204,113,0.6); }
+    .marker-cluster-small div { background-color: rgba(46,204,113,0.8); }
+    .marker-cluster-medium { background-color: rgba(241,196,15,0.6); }
+    .marker-cluster-medium div { background-color: rgba(241,196,15,0.8); }
+    .marker-cluster-large  { background-color: rgba(231,76,60,0.6); }
+    .marker-cluster-large div { background-color: rgba(231,76,60,0.8); }
+    .marker-cluster { background-clip: padding-box; border-radius: 20px; }
     .marker-cluster div {
-      width: 30px;
-      height: 30px;
-      margin-left: 5px;
-      margin-top: 5px;
-      text-align: center;
-      border-radius: 15px;
-      font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
-      font-weight: bold;
+      width: 30px; height: 30px;
+      margin-left: 5px; margin-top: 5px;
+      text-align: center; border-radius: 15px;
+      font: bold 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
     }
+    .marker-cluster span { line-height: 30px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
 
-    .marker-cluster span {
-      line-height: 30px;
-      color: white;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-
-    /* Botões de controle personalizados */
     .custom-controls {
-      position: absolute;
-      top: 100px;
-      right: 10px;
+      position: absolute; top: 100px; right: 10px;
       z-index: 1000;
     }
-
     .control-button {
-      background: white;
-      border: none;
-      padding: 10px 15px;
-      margin-bottom: 5px;
-      border-radius: 5px;
-      cursor: pointer;
+      background: white; border: none;
+      padding: 10px 15px; margin-bottom: 5px;
+      border-radius: 5px; cursor: pointer;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      transition: all 0.3s;
-      display: block;
-      width: 100%;
-      font-size: 14px;
+      transition: all 0.3s; display: block; width: 100%; font-size: 14px;
     }
+    .control-button:hover { background: #f0f0f0; box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+    .control-button:active { transform: scale(0.98); }
 
-    .control-button:hover {
-      background: #f0f0f0;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-    }
+    .leaflet-popup-content { margin: 15px; line-height: 1.6; }
+    .leaflet-popup-content h3 { font-family: 'Georgia', serif; }
 
-    .control-button:active {
-      transform: scale(0.98);
-    }
-
-    /* Popup customizado */
-    .leaflet-popup-content {
-      margin: 15px;
-      line-height: 1.6;
-    }
-
-    .leaflet-popup-content h3 {
-      font-family: 'Georgia', serif;
-    }
-
-    /* Loading spinner */
     .loading {
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      z-index: 2000;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
+      z-index: 2000; background: white;
+      padding: 30px; border-radius: 10px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       text-align: center;
     }
-
-    .loading.hidden {
-      display: none;
-    }
-
+    .loading.hidden { display: none; }
     .spinner {
       border: 4px solid #f3f3f3;
       border-top: 4px solid #2d5016;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      border-radius: 50%; width: 40px; height: 40px;
       animation: spin 1s linear infinite;
       margin: 0 auto 15px;
     }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Responsividade */
     @media (max-width: 768px) {
-      .header h1 {
-        font-size: 18px;
-      }
-
-      .header p {
-        font-size: 12px;
-      }
-
-      .search-panel {
-        width: calc(100% - 40px);
-        max-height: 60vh;
-        left: 10px;
-        right: 10px;
-      }
-
-      .leaflet-popup-content {
-        max-width: 250px !important;
-      }
-
-      .custom-controls {
-        top: auto;
-        bottom: 20px;
-        right: 10px;
-      }
+      .header h1 { font-size: 18px; }
+      .header p  { font-size: 12px; }
+      .search-panel { width: calc(100% - 40px); max-height: 60vh; left: 10px; right: 10px; }
+      .leaflet-popup-content { max-width: 250px !important; }
+      .custom-controls { top: auto; bottom: 20px; right: 10px; }
     }
 
-    /* Info box */
-    .info {
-      padding: 6px 8px;
-      font: 14px/16px Arial, Helvetica, sans-serif;
-      background: white;
-      background: rgba(255,255,255,0.95);
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      border-radius: 5px;
-    }
+    .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: rgba(255,255,255,0.95); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
 
-    .info h4 {
-      margin: 0 0 5px;
-      color: #777;
-    }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    .marker-selected { animation: pulse 1.5s infinite; }
 
-    /* Ajustes da legenda */
-    .legend {
-      line-height: 1.5;
-      color: #555;
-    }
-
-    .legend i {
-      width: 18px;
-      height: 18px;
-      float: left;
-      margin-right: 8px;
-      opacity: 0.7;
-    }
-
-    /* Destaque no marcador selecionado */
-    .marker-selected {
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
+    /* Separador de seção no painel */
+    .section-divider {
+      font-size: 11px;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 14px 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px dashed #ddd;
     }
   </style>
-<base target="_blank">
+  <base target="_blank">
 </head>
 <body>
 
-  <!-- Loading spinner -->
   <div class="loading" id="loading">
     <div class="spinner"></div>
     <p>Carregando dados do herbário...</p>
   </div>
 
-  <!-- Botão toggle painel (mobile) -->
   <button class="toggle-search" id="toggleSearch" onclick="toggleSearchPanel()">
     🔍 Pesquisar
   </button>
 
-  <!-- Painel de Pesquisa -->
+  <!-- ======================================================
+       PAINEL DE PESQUISA
+  ======================================================= -->
   <div class="search-panel" id="searchPanel">
     <h3>🔍 Pesquisar Plantas</h3>
 
+    <!-- Filtro de Ano — destaque visual no topo do painel -->
+    <div class="search-input-group year-filter">
+      <label for="searchAno">📆 Ano de Coleta</label>
+      <select id="searchAno" onchange="this.value ? realizarPesquisa() : limparPesquisa()">
+        <option value="">Todos os anos</option>
+        <!-- Populado dinamicamente pelo JS -->
+      </select>
+    </div>
+
+    <div class="section-divider">— ou refine por outros critérios —</div>
+
     <div class="search-input-group">
       <label for="searchNome">Nome Científico ou Comum</label>
-      <input type="text" id="searchNome" placeholder="Ex: Graviola, Annona..." onkeyup="if(event.key==='Enter') realizarPesquisa()">
+      <input type="text" id="searchNome" placeholder="Ex: Graviola, Annona..."
+             onkeyup="if(event.key==='Enter') realizarPesquisa()">
     </div>
 
     <div class="search-input-group">
       <label for="searchFamilia">Família</label>
-      <input type="text" id="searchFamilia" placeholder="Ex: Annonaceae..." list="familiasList" onkeyup="if(event.key==='Enter') realizarPesquisa()">
+      <input type="text" id="searchFamilia" placeholder="Ex: Annonaceae..."
+             list="familiasList" onkeyup="if(event.key==='Enter') realizarPesquisa()">
       <datalist id="familiasList"></datalist>
     </div>
 
     <div class="search-input-group">
       <label for="searchGenero">Gênero</label>
-      <input type="text" id="searchGenero" placeholder="Ex: Annona..." list="generosList" onkeyup="if(event.key==='Enter') realizarPesquisa()">
+      <input type="text" id="searchGenero" placeholder="Ex: Annona..."
+             list="generosList" onkeyup="if(event.key==='Enter') realizarPesquisa()">
       <datalist id="generosList"></datalist>
     </div>
 
     <div class="search-input-group">
       <label for="searchDeterminador">Determinador</label>
-      <input type="text" id="searchDeterminador" placeholder="Ex: NASCIMENTO..." onkeyup="if(event.key==='Enter') realizarPesquisa()">
+      <input type="text" id="searchDeterminador" placeholder="Ex: NASCIMENTO..."
+             onkeyup="if(event.key==='Enter') realizarPesquisa()">
     </div>
 
     <div class="search-buttons">
-      <button class="btn btn-primary" onclick="realizarPesquisa()">
-        🔍 Buscar
-      </button>
-      <button class="btn btn-secondary" onclick="limparPesquisa()">
-        ✕ Limpar
-      </button>
+      <button class="btn btn-primary"   onclick="realizarPesquisa()">🔍 Buscar</button>
+      <button class="btn btn-secondary" onclick="limparPesquisa()">✕ Limpar</button>
     </div>
 
-    <div class="search-results" id="searchResults" style="display: none;">
+    <div class="search-results" id="searchResults" style="display:none;">
       <div class="results-count" id="resultsCount"></div>
-      <div class="results-list" id="resultsList"></div>
+      <div class="results-list"  id="resultsList"></div>
     </div>
   </div>
 
-  <!-- Controles personalizados -->
+  <!-- Controles -->
   <div class="custom-controls">
-    <button class="control-button" onclick="voltarParaVisaoGeral()">
-      🏠 Visão Geral
-    </button>
-    <button class="control-button" onclick="toggleClusters()">
-      🔄 Desativar Clusters
-    </button>
-    <button class="control-button" onclick="toggleAreas()">
-      📍 Toggle Áreas
-    </button>
-    <button class="control-button" onclick="mostrarEstatisticas()">
-      📊 Estatísticas
-    </button>
+    <button class="control-button" onclick="voltarParaVisaoGeral()">🏠 Visão Geral</button>
+    <button class="control-button" onclick="toggleClusters()">🔄 Desativar Clusters</button>
+    <button class="control-button" onclick="toggleAreas()">📍 Toggle Áreas</button>
+    <button class="control-button" onclick="mostrarEstatisticas()">📊 Estatísticas</button>
   </div>
 
-  <!-- Mapa -->
   <div id="map"></div>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Leaflet MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-
-  <!-- Script principal do mapa -->
   <script src="main.js"></script>
 
   <script>
-    // Funções de controle
-    let clustersEnabled = true;
-    let areasEnabled = true;
-
     function voltarParaVisaoGeral() {
       map.setView([-1.4583, -48.4358], 16);
     }
 
     function toggleSearchPanel() {
       const panel = document.getElementById('searchPanel');
-      const btn = document.getElementById('toggleSearch');
-
+      const btn   = document.getElementById('toggleSearch');
       if (panel.style.display === 'none') {
         panel.style.display = 'block';
-        btn.style.display = 'none';
+        btn.style.display   = 'none';
       } else {
         panel.style.display = 'none';
-        btn.style.display = 'block';
+        btn.style.display   = 'block';
       }
     }
 
-    // A função toggleClusters agora está no arquivo JavaScript principal
-    // e atualiza o texto do botão automaticamente
-
-    // A função toggleAreas também está no arquivo JavaScript principal
-
-    function mostrarEstatisticas() {
-      // Contar plantas por área
-      let dentroAreas = 0;
-      let foraAreas = 0;
-
-      marcadoresIndividuais.forEach(marker => {
-        const latlng = marker.getLatLng();
-        let dentroDeAlgumaArea = false;
-
-        areas.forEach(area => {
-          if (area.tipo !== 'linha') {
-            const polygon = L.polygon(area.coordenadas);
-            if (polygon.getBounds().contains(latlng)) {
-              dentroDeAlgumaArea = true;
-            }
-          }
-        });
-
-        if (dentroDeAlgumaArea) {
-          dentroAreas++;
-        } else {
-          foraAreas++;
-        }
-      });
-
-      const stats = `
-        <div style="text-align: left; padding: 20px; min-width: 300px;">
-          <h3 style="margin-top: 0; color: #2d5016; border-bottom: 2px solid #4a7c2c; padding-bottom: 10px;">
-            📊 Estatísticas do Mapa
-          </h3>
-
-          <div style="background: #f0f8ff; padding: 10px; border-radius: 5px; margin: 10px 0;">
-            <strong>🌿 Plantas Catalogadas</strong><br>
-            Total: <strong>${marcadoresIndividuais.length}</strong> espécimes
-          </div>
-
-          <div style="background: #f0fff0; padding: 10px; border-radius: 5px; margin: 10px 0;">
-            <strong>📍 Distribuição Espacial</strong><br>
-            Dentro das áreas: <strong>${dentroAreas}</strong><br>
-            Fora das áreas: <strong>${foraAreas}</strong>
-          </div>
-
-          <div style="background: #fff8f0; padding: 10px; border-radius: 5px; margin: 10px 0;">
-            <strong>🗺️ Áreas Mapeadas</strong><br>
-            Total: <strong>${areas.length}</strong> áreas<br>
-            Polígonos: <strong>4</strong><br>
-            Trilhas: <strong>1</strong>
-          </div>
-
-          <div style="background: #f8f8f8; padding: 10px; border-radius: 5px; margin: 10px 0;">
-            <strong>⚙️ Sistema</strong><br>
-            Clusters: <strong>${clustersAtivados ? '✅ Ativados' : '❌ Desativados'}</strong><br>
-            Áreas visíveis: <strong>${map.hasLayer(areasLayerGroup) ? '✅ Sim' : '❌ Não'}</strong>
-          </div>
-
-          <p style="font-size: 11px; color: #666; margin-top: 15px; text-align: center;">
-            <em>Herbário UFRA Campus Belém</em>
-          </p>
-        </div>
-      `;
-
-      L.popup()
-        .setLatLng([-1.4583, -48.4358])
-        .setContent(stats)
-        .openOn(map);
-    }
-
-    // Esconder loading após carregar
     window.addEventListener('load', function() {
       setTimeout(function() {
         const loading = document.getElementById('loading');
-        if (loading) {
-          loading.classList.add('hidden');
-        }
+        if (loading) loading.classList.add('hidden');
       }, 1000);
     });
-
-    // Adicionar informações no console
-    console.log('%c🌿 Mapa Botânico UFRA', 'font-size: 20px; color: #2d5016; font-weight: bold;');
-    console.log('%cDesenvolvido para o Herbário do Campus Belém', 'font-size: 12px; color: #666;');
-    console.log('');
-    console.log('📊 Funcionalidades:');
-    console.log('  • Clustering de marcadores (ativar/desativar)');
-    console.log('  • Visualização de áreas do campus');
-    console.log('  • Marcadores coloridos por precisão');
-    console.log('  • Popups informativos');
-    console.log('  • Estatísticas em tempo real');
-    console.log('  • 🔍 PESQUISA AVANÇADA por família, gênero, espécie e nome comum');
-    console.log('');
-    console.log('💡 Comandos disponíveis:');
-    console.log('  toggleClusters() - Ativar/desativar agrupamento');
-    console.log('  toggleAreas() - Mostrar/ocultar áreas');
-    console.log('  mostrarEstatisticas() - Exibir estatísticas');
-    console.log('  realizarPesquisa() - Executar busca');
-    console.log('  limparPesquisa() - Limpar filtros');
-    console.log('');
   </script>
 </body>
 </html>
