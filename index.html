@@ -93,6 +93,37 @@
       background: white;
     }
 
+    /* Destaque visual para o filtro de tipo */
+    .search-input-group.tipo-filter label {
+      color: #5a3e8a;
+    }
+    .search-input-group.tipo-filter select {
+      border-color: #c9b8e8;
+      background: #faf6ff;
+      font-weight: 600;
+      color: #5a3e8a;
+    }
+    .search-input-group.tipo-filter select:focus {
+      border-color: #7c4dbc;
+      background: white;
+    }
+
+    /* Badges de tipo nos resultados */
+    .tipo-badge {
+      display: inline-block;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .tipo-frutifera   { background: #fff3cd; color: #856404; }
+    .tipo-medicinal   { background: #d1e7dd; color: #0a3622; }
+    .tipo-ornamental  { background: #f8d7da; color: #842029; }
+    .tipo-madeireira  { background: #d4edda; color: #5c4033; }
+    .tipo-oportunista { background: #e2e3e5; color: #383d41; }
+
     .search-buttons { display: flex; gap: 8px; margin-top: 15px; }
     .btn {
       flex: 1; padding: 10px;
@@ -240,12 +271,24 @@
   <div class="search-panel" id="searchPanel">
     <h3>🔍 Pesquisar Plantas</h3>
 
-    <!-- Filtro de Ano — destaque visual no topo do painel -->
+    <!-- Filtro de Ano -->
     <div class="search-input-group year-filter">
       <label for="searchAno">📆 Ano de Coleta</label>
       <select id="searchAno" onchange="this.value ? realizarPesquisa() : limparPesquisa()">
         <option value="">Todos os anos</option>
-        <!-- Populado dinamicamente pelo JS -->
+      </select>
+    </div>
+
+    <!-- Filtro de Tipo -->
+    <div class="search-input-group tipo-filter">
+      <label for="searchTipo">🏷️ Tipo de Planta</label>
+      <select id="searchTipo" onchange="this.value ? realizarPesquisa() : limparPesquisa()">
+        <option value="">Todos os tipos</option>
+        <option value="frutifera">🍎 Frutífera</option>
+        <option value="medicinal">💊 Medicinal</option>
+        <option value="ornamental">🌸 Ornamental</option>
+        <option value="madeireira">🪵 Madeireira</option>
+        <option value="oportunista">🌿 Oportunista</option>
       </select>
     </div>
 

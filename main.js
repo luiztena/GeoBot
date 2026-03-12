@@ -272,8 +272,9 @@ window.realizarPesquisa = function() {
   const generoFiltro      = normalizarTexto(document.getElementById('searchGenero').value);
   const determinadorFiltro = normalizarTexto(document.getElementById('searchDeterminador').value);
   const anoFiltro         = (document.getElementById('searchAno').value || '').trim();
+  const tipoFiltro        = (document.getElementById('searchTipo').value || '').trim();
 
-  if (!nomeFiltro && !familiaFiltro && !generoFiltro && !determinadorFiltro && !anoFiltro) {
+  if (!nomeFiltro && !familiaFiltro && !generoFiltro && !determinadorFiltro && !anoFiltro && !tipoFiltro) {
     alert('Por favor, preencha pelo menos um campo de pesquisa.');
     return;
   }
@@ -285,17 +286,19 @@ window.realizarPesquisa = function() {
         ? planta['nome-vulgar'].join(' ')
         : planta['nome-vulgar']
     );
-    const familia     = normalizarTexto(planta.familia);
-    const genero      = normalizarTexto(planta.genero);
+    const familia      = normalizarTexto(planta.familia);
+    const genero       = normalizarTexto(planta.genero);
     const determinador = normalizarTexto(planta.determinator);
-    const anoPlanta   = extrairAno(planta.data);
+    const anoPlanta    = extrairAno(planta.data);
+    const tipoPlanta   = (planta.tipo || '').toLowerCase().trim();
 
     const criterios = [];
-    if (nomeFiltro)        criterios.push(nomeCientifico.includes(nomeFiltro) || nomeVulgar.includes(nomeFiltro));
-    if (familiaFiltro)     criterios.push(familia.includes(familiaFiltro));
-    if (generoFiltro)      criterios.push(genero.includes(generoFiltro));
+    if (nomeFiltro)         criterios.push(nomeCientifico.includes(nomeFiltro) || nomeVulgar.includes(nomeFiltro));
+    if (familiaFiltro)      criterios.push(familia.includes(familiaFiltro));
+    if (generoFiltro)       criterios.push(genero.includes(generoFiltro));
     if (determinadorFiltro) criterios.push(determinador.includes(determinadorFiltro));
-    if (anoFiltro)         criterios.push(anoPlanta === anoFiltro);
+    if (anoFiltro)          criterios.push(anoPlanta === anoFiltro);
+    if (tipoFiltro)         criterios.push(tipoPlanta === tipoFiltro);
 
     return criterios.length > 0 && criterios.every(c => c === true);
   });
@@ -323,9 +326,18 @@ function exibirResultadosPesquisa(plantasFiltradas) {
       ? planta['nome-vulgar'][0]
       : planta['nome-vulgar'];
     const ano = extrairAno(planta.data);
+
+    // Badge de tipo
+    const tipoEmoji = { frutifera:'🍎', medicinal:'💊', ornamental:'🌸', madeireira:'🪵', oportunista:'🌿' };
+    const tipoLabel = { frutifera:'Frutífera', medicinal:'Medicinal', ornamental:'Ornamental', madeireira:'Madeireira', oportunista:'Oportunista' };
+    const tipoKey   = (planta.tipo || '').toLowerCase();
+    const tipoBadge = tipoKey
+      ? `<span class="tipo-badge tipo-${tipoKey}">${tipoEmoji[tipoKey] || '🌱'} ${tipoLabel[tipoKey] || planta.tipo}</span>`
+      : '';
+
     return `
       <div class="result-item" onclick="destacarPlanta('${planta.id}')">
-        <strong>${planta.nome}</strong>
+        <strong>${planta.nome} ${tipoBadge}</strong>
         <small>
           ${nomeVulgar ? '🌿 ' + nomeVulgar + ' | ' : ''}
           🧑‍🔬 ${planta.determinator || 'N/I'} |
@@ -403,11 +415,12 @@ window.destacarPlanta = function(plantaId) {
 };
 
 window.limparPesquisa = function() {
-  document.getElementById('searchNome').value        = '';
-  document.getElementById('searchFamilia').value     = '';
-  document.getElementById('searchGenero').value      = '';
+  document.getElementById('searchNome').value         = '';
+  document.getElementById('searchFamilia').value      = '';
+  document.getElementById('searchGenero').value       = '';
   document.getElementById('searchDeterminador').value = '';
-  document.getElementById('searchAno').value         = '';
+  document.getElementById('searchAno').value          = '';
+  document.getElementById('searchTipo').value         = '';
   document.getElementById('searchResults').style.display = 'none';
 
   pesquisaAtiva = false;
@@ -467,6 +480,7 @@ async function carregarPlantas() {
             <p style="margin:5px 0;"><strong>👤 Coletor:</strong> ${planta.coletor || 'Não informado'}</p>
             ${planta.determinator ? `<p style="margin:5px 0;"><strong>🧑🏽‍🔬 Determinador:</strong> ${planta.determinator}</p>` : ''}
             <p style="margin:5px 0;"><strong>📅 Data:</strong> ${planta.data || 'Não informada'}${ano ? ` <span style="background:#e8f5e9;color:#2d5016;border-radius:4px;padding:1px 6px;font-size:11px;margin-left:4px;">📆 ${ano}</span>` : ''}</p>
+            ${planta.tipo ? (() => { const tipoEmoji={frutifera:'🍎',medicinal:'💊',ornamental:'🌸',madeireira:'🪵',oportunista:'🌿'}; const tipoLabel={frutifera:'Frutífera',medicinal:'Medicinal',ornamental:'Ornamental',madeireira:'Madeireira',oportunista:'Oportunista'}; const k=planta.tipo.toLowerCase(); return `<p style="margin:5px 0;"><strong>🏷️ Tipo:</strong> <span style="background:#f0f0f0;border-radius:4px;padding:2px 8px;font-size:12px;">${tipoEmoji[k]||'🌱'} ${tipoLabel[k]||planta.tipo}</span></p>`; })() : ''}
             <p style="margin:5px 0;font-size:11px;color:#666;"><strong>🗺️ Coordenadas:</strong> ${planta.coordenadas || `${planta.latitude.toFixed(6)}, ${planta.longitude.toFixed(6)}`}</p>
             <p style="margin:5px 0;font-size:11px;color:#666;"><strong>🆔 ID:</strong> ${planta.id}</p>
           </div>
@@ -519,18 +533,8 @@ function adicionarLegenda(precisos, imprecisos) {
         🗺️ Legenda do Mapa
       </div>
       <div style="font-weight:bold;margin-top:10px;margin-bottom:5px;font-size:12px;">Plantas Coletadas:</div>
-      <div style="margin:5px 0;font-size:11px;">
-        <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png" style="width:12px;height:20px;vertical-align:middle;margin-right:5px;">
-        Coordenadas precisas (${precisos})
-      </div>
-      <div style="margin:5px 0;font-size:11px;">
-        <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png" style="width:12px;height:20px;vertical-align:middle;margin-right:5px;">
-        Coordenadas imprecisas (${imprecisos})
-      </div>
-      <div style="margin:5px 0;font-size:11px;">
-        <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png" style="width:12px;height:20px;vertical-align:middle;margin-right:5px;">
-        Resultado da pesquisa
-      </div>
+   
+
       <div style="font-weight:bold;margin-top:10px;margin-bottom:5px;font-size:12px;">Áreas do Campus:</div>
       ${areas.map(area => `
         <div style="margin:5px 0;font-size:11px;">
@@ -594,6 +598,18 @@ window.mostrarEstatisticas = function() {
     .map(a => `<span style="display:inline-block;background:#e8f5e9;border-radius:4px;padding:2px 7px;margin:2px;font-size:11px;"><strong>${a}</strong>: ${porAno[a]}</span>`)
     .join('');
 
+  // Contar por tipo
+  const porTipo = {};
+  const tipoEmoji = { frutifera:'🍎', medicinal:'💊', ornamental:'🌸', madeireira:'🪵', oportunista:'🌿' };
+  const tipoLabel = { frutifera:'Frutífera', medicinal:'Medicinal', ornamental:'Ornamental', madeireira:'Madeireira', oportunista:'Oportunista' };
+  todasAsPlantas.forEach(p => {
+    const t = (p.tipo || 'N/I').toLowerCase();
+    porTipo[t] = (porTipo[t] || 0) + 1;
+  });
+  const listaTipos = Object.keys(porTipo).sort()
+    .map(t => `<span style="display:inline-block;background:#f0f0f0;border-radius:4px;padding:2px 7px;margin:2px;font-size:11px;">${tipoEmoji[t]||'🌱'} <strong>${tipoLabel[t]||t}</strong>: ${porTipo[t]}</span>`)
+    .join('');
+
   const stats = `
     <div style="text-align:left;padding:20px;min-width:300px;">
       <h3 style="margin-top:0;color:#2d5016;border-bottom:2px solid #4a7c2c;padding-bottom:10px;">
@@ -606,6 +622,10 @@ window.mostrarEstatisticas = function() {
       <div style="background:#f0fff0;padding:10px;border-radius:5px;margin:10px 0;">
         <strong>📆 Coletas por Ano</strong><br>
         <div style="margin-top:6px;">${listaAnos}</div>
+      </div>
+      <div style="background:#f5f0ff;padding:10px;border-radius:5px;margin:10px 0;">
+        <strong>🏷️ Plantas por Tipo</strong><br>
+        <div style="margin-top:6px;">${listaTipos}</div>
       </div>
       <div style="background:#fff8f0;padding:10px;border-radius:5px;margin:10px 0;">
         <strong>🗺️ Áreas Mapeadas</strong><br>
