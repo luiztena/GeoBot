@@ -79,9 +79,7 @@
     }
 
     /* Destaque visual para o filtro de ano */
-    .search-input-group.year-filter label {
-      color: #2d5016;
-    }
+    .search-input-group.year-filter label { color: #2d5016; }
     .search-input-group.year-filter select {
       border-color: #a8d5a2;
       background: #f6fff6;
@@ -94,9 +92,7 @@
     }
 
     /* Destaque visual para o filtro de tipo */
-    .search-input-group.tipo-filter label {
-      color: #5a3e8a;
-    }
+    .search-input-group.tipo-filter label { color: #5a3e8a; }
     .search-input-group.tipo-filter select {
       border-color: #c9b8e8;
       background: #faf6ff;
@@ -105,6 +101,19 @@
     }
     .search-input-group.tipo-filter select:focus {
       border-color: #7c4dbc;
+      background: white;
+    }
+
+    /* Destaque visual para o filtro de grupo */
+    .search-input-group.grupo-filter label { color: #7b4a00; }
+    .search-input-group.grupo-filter select {
+      border-color: #f5c07a;
+      background: #fffbf2;
+      font-weight: 600;
+      color: #7b4a00;
+    }
+    .search-input-group.grupo-filter select:focus {
+      border-color: #e08c00;
       background: white;
     }
 
@@ -123,6 +132,20 @@
     .tipo-ornamental  { background: #f8d7da; color: #842029; }
     .tipo-madeireira  { background: #d4edda; color: #5c4033; }
     .tipo-oportunista { background: #e2e3e5; color: #383d41; }
+
+    /* Badge de grupo */
+    .grupo-badge {
+      display: inline-block;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .grupo-mono   { background: #fff3cd; color: #7b4a00; }
+    .grupo-eudi   { background: #d1ecf1; color: #0c5460; }
+    .grupo-basal  { background: #f3d9fa; color: #5b1f6e; }
 
     .search-buttons { display: flex; gap: 8px; margin-top: 15px; }
     .btn {
@@ -153,7 +176,6 @@
     .result-item strong { color: #2d5016; font-size: 13px; display: block; margin-bottom: 2px; }
     .result-item small  { color: #666; font-size: 11px; }
 
-    /* Badge de ano nos resultados */
     .ano-badge {
       display: inline-block;
       background: #e8f5e9;
@@ -240,7 +262,6 @@
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
     .marker-selected { animation: pulse 1.5s infinite; }
 
-    /* Separador de seção no painel */
     .section-divider {
       font-size: 11px;
       font-weight: 700;
@@ -289,6 +310,17 @@
         <option value="ornamental">🌸 Ornamental</option>
         <option value="madeireira">🪵 Madeireira</option>
         <option value="oportunista">🌿 Oportunista</option>
+      </select>
+    </div>
+
+    <!-- Filtro de Grupo Taxonômico -->
+    <div class="search-input-group grupo-filter">
+      <label for="searchGrupo">🧬 Grupo Taxonômico</label>
+      <select id="searchGrupo" onchange="this.value ? realizarPesquisa() : limparPesquisa()">
+        <option value="">Todos os grupos</option>
+        <option value="Monocotiledôneas">🌾 Monocotiledôneas</option>
+        <option value="Eudicotiledôneas">🌿 Eudicotiledôneas</option>
+        <option value="Angiospermas Basais">🌺 Angiospermas Basais</option>
       </select>
     </div>
 

@@ -214,16 +214,28 @@ let marcadoresFiltrados = [];
 let pesquisaAtiva = false;
 
 // ============================================================================
+// MAPEAMENTO DE GRUPO PARA EXIBIÇÃO
+// ============================================================================
+
+const grupoConfig = {
+  'Monocotiledôneas':   { emoji: '🌾', cor: '#856404', bg: '#fff3cd' },
+  'Eudicotiledôneas':   { emoji: '🌿', cor: '#0c5460', bg: '#d1ecf1' },
+  'Angiospermas Basais':{ emoji: '🌺', cor: '#5b1f6e', bg: '#f3d9fa' }
+};
+
+function renderGrupoBadge(grupo) {
+  if (!grupo) return '';
+  const cfg = grupoConfig[grupo];
+  if (!cfg) return `<span style="background:#eee;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">${grupo}</span>`;
+  return `<span style="background:${cfg.bg};color:${cfg.cor};border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">${cfg.emoji} ${grupo}</span>`;
+}
+
+// ============================================================================
 // FUNÇÕES AUXILIARES DE ANO
 // ============================================================================
 
-/**
- * Extrai o ano de uma string de data em qualquer formato razoável.
- * Retorna null se não encontrar um ano de 4 dígitos.
- */
 function extrairAno(dataStr) {
   if (!dataStr || dataStr === 'INDEFINIDO') return null;
-  // Busca qualquer sequência de 4 dígitos que pareça um ano (1900–2099)
   const match = dataStr.toString().match(/\b(19|20)\d{2}\b/);
   return match ? match[0] : null;
 }
@@ -247,10 +259,6 @@ function preencherDatalists() {
   if (generosList)  generosList.innerHTML  = generos.map(g  => `<option value="${g}">`).join('');
 }
 
-/**
- * Preenche o <select> de anos com os anos únicos presentes nos dados,
- * em ordem crescente.
- */
 function preencherFiltroAno() {
   const anos = [...new Set(
     todasAsPlantas
@@ -260,28 +268,27 @@ function preencherFiltroAno() {
 
   const select = document.getElementById('searchAno');
   if (!select) return;
-
-  // Mantém a opção padrão e adiciona os anos
   select.innerHTML = '<option value="">Todos os anos</option>' +
     anos.map(a => `<option value="${a}">${a}</option>`).join('');
 }
 
 window.realizarPesquisa = function() {
-  const nomeFiltro        = normalizarTexto(document.getElementById('searchNome').value);
-  const familiaFiltro     = normalizarTexto(document.getElementById('searchFamilia').value);
-  const generoFiltro      = normalizarTexto(document.getElementById('searchGenero').value);
+  const nomeFiltro         = normalizarTexto(document.getElementById('searchNome').value);
+  const familiaFiltro      = normalizarTexto(document.getElementById('searchFamilia').value);
+  const generoFiltro       = normalizarTexto(document.getElementById('searchGenero').value);
   const determinadorFiltro = normalizarTexto(document.getElementById('searchDeterminador').value);
-  const anoFiltro         = (document.getElementById('searchAno').value || '').trim();
-  const tipoFiltro        = (document.getElementById('searchTipo').value || '').trim();
+  const anoFiltro          = (document.getElementById('searchAno').value || '').trim();
+  const tipoFiltro         = (document.getElementById('searchTipo').value || '').trim();
+  const grupoFiltro        = (document.getElementById('searchGrupo').value || '').trim();
 
-  if (!nomeFiltro && !familiaFiltro && !generoFiltro && !determinadorFiltro && !anoFiltro && !tipoFiltro) {
+  if (!nomeFiltro && !familiaFiltro && !generoFiltro && !determinadorFiltro && !anoFiltro && !tipoFiltro && !grupoFiltro) {
     alert('Por favor, preencha pelo menos um campo de pesquisa.');
     return;
   }
 
   const plantasFiltradas = todasAsPlantas.filter(planta => {
     const nomeCientifico = normalizarTexto(planta.nome);
-    const nomeVulgar = normalizarTexto(
+    const nomeVulgar     = normalizarTexto(
       Array.isArray(planta['nome-vulgar'])
         ? planta['nome-vulgar'].join(' ')
         : planta['nome-vulgar']
@@ -290,7 +297,8 @@ window.realizarPesquisa = function() {
     const genero       = normalizarTexto(planta.genero);
     const determinador = normalizarTexto(planta.determinator);
     const anoPlanta    = extrairAno(planta.data);
-    const tipoPlanta   = (planta.tipo || '').toLowerCase().trim();
+    const tipoPlanta   = (planta.tipo  || '').toLowerCase().trim();
+    const grupoPlanta  = (planta.grupo || '').trim();
 
     const criterios = [];
     if (nomeFiltro)         criterios.push(nomeCientifico.includes(nomeFiltro) || nomeVulgar.includes(nomeFiltro));
@@ -299,6 +307,7 @@ window.realizarPesquisa = function() {
     if (determinadorFiltro) criterios.push(determinador.includes(determinadorFiltro));
     if (anoFiltro)          criterios.push(anoPlanta === anoFiltro);
     if (tipoFiltro)         criterios.push(tipoPlanta === tipoFiltro);
+    if (grupoFiltro)        criterios.push(grupoPlanta === grupoFiltro);
 
     return criterios.length > 0 && criterios.every(c => c === true);
   });
@@ -335,9 +344,13 @@ function exibirResultadosPesquisa(plantasFiltradas) {
       ? `<span class="tipo-badge tipo-${tipoKey}">${tipoEmoji[tipoKey] || '🌱'} ${tipoLabel[tipoKey] || planta.tipo}</span>`
       : '';
 
+    // Badge de grupo
+    const grupoBadge = planta.grupo ? renderGrupoBadge(planta.grupo) : '';
+
     return `
       <div class="result-item" onclick="destacarPlanta('${planta.id}')">
         <strong>${planta.nome} ${tipoBadge}</strong>
+        <div style="margin-top:4px;">${grupoBadge}</div>
         <small>
           ${nomeVulgar ? '🌿 ' + nomeVulgar + ' | ' : ''}
           🧑‍🔬 ${planta.determinator || 'N/I'} |
@@ -421,6 +434,7 @@ window.limparPesquisa = function() {
   document.getElementById('searchDeterminador').value = '';
   document.getElementById('searchAno').value          = '';
   document.getElementById('searchTipo').value         = '';
+  document.getElementById('searchGrupo').value        = '';  // ← limpa grupo
   document.getElementById('searchResults').style.display = 'none';
 
   pesquisaAtiva = false;
@@ -447,7 +461,7 @@ async function carregarPlantas() {
     console.log(`✅ Dados carregados: ${plantas.length} plantas encontradas.`);
 
     preencherDatalists();
-    preencherFiltroAno(); // ← preenche o select de anos
+    preencherFiltroAno();
 
     let precisos = 0;
     let imprecisos = 0;
@@ -466,6 +480,7 @@ async function carregarPlantas() {
 
         const ano = extrairAno(planta.data);
 
+        // Popup com campo Grupo
         marker.bindPopup(`
           <div style="min-width: 250px; max-width: 350px;">
             <h3 style="margin:0 0 10px 0;color:#2d5016;font-size:16px;border-bottom:2px solid #4a7c2c;padding-bottom:5px;">
@@ -475,6 +490,7 @@ async function carregarPlantas() {
             ${avisPrecisao}
             <p style="margin:5px 0;"><strong>🌿 Família:</strong> ${planta.familia || 'Não informada'}</p>
             <p style="margin:5px 0;"><strong>🔬 Gênero:</strong> ${planta.genero || 'Não informado'}</p>
+            ${planta.grupo ? `<p style="margin:5px 0;"><strong>🧬 Grupo:</strong> ${renderGrupoBadge(planta.grupo)}</p>` : ''}
             ${planta.descricao ? `<p style="margin:5px 0;"><strong>📝 Descrição:</strong> ${planta.descricao}</p>` : ''}
             <p style="margin:5px 0;"><strong>📍 Local:</strong> ${planta.local || 'Não informado'}</p>
             <p style="margin:5px 0;"><strong>👤 Coletor:</strong> ${planta.coletor || 'Não informado'}</p>
@@ -527,13 +543,18 @@ function adicionarLegenda(precisos, imprecisos) {
   const legend = L.control({ position: 'bottomright' });
   legend.onAdd = function() {
     const div = L.DomUtil.create('div', 'info legend');
-    div.style.cssText = 'background:white;padding:15px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.3);max-width:250px;';
+    div.style.cssText = 'background:white;padding:15px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.3);max-width:260px;';
     div.innerHTML = `
       <div style="font-weight:bold;font-size:14px;margin-bottom:10px;border-bottom:2px solid #2d5016;padding-bottom:5px;color:#2d5016;">
         🗺️ Legenda do Mapa
       </div>
-      <div style="font-weight:bold;margin-top:10px;margin-bottom:5px;font-size:12px;">Plantas Coletadas:</div>
-   
+
+      <div style="font-weight:bold;margin-top:10px;margin-bottom:5px;font-size:12px;">🧬 Grupos Taxonômicos:</div>
+      ${Object.entries(grupoConfig).map(([nome, cfg]) => `
+        <div style="margin:4px 0;font-size:11px;">
+          <span style="display:inline-block;background:${cfg.bg};color:${cfg.cor};border-radius:4px;padding:1px 7px;font-weight:700;font-size:11px;">${cfg.emoji} ${nome}</span>
+        </div>
+      `).join('')}
 
       <div style="font-weight:bold;margin-top:10px;margin-bottom:5px;font-size:12px;">Áreas do Campus:</div>
       ${areas.map(area => `
@@ -542,6 +563,7 @@ function adicionarLegenda(precisos, imprecisos) {
           ${area.nome}${area.tipo === 'linha' ? ' 🚶' : ''}
         </div>
       `).join('')}
+
       <div style="margin-top:10px;padding-top:10px;border-top:1px solid #ddd;font-size:10px;color:#666;">
         <strong>Total:</strong> ${precisos + imprecisos} plantas mapeadas<br>
         <em style="font-size:9px;">Use o painel de pesquisa para filtrar</em>
@@ -587,18 +609,17 @@ window.toggleClusters = function() {
 };
 
 window.mostrarEstatisticas = function() {
-  // Contar por ano
+  // Por ano
   const porAno = {};
   todasAsPlantas.forEach(p => {
     const ano = extrairAno(p.data) || 'N/I';
     porAno[ano] = (porAno[ano] || 0) + 1;
   });
-  const anosOrdenados = Object.keys(porAno).sort();
-  const listaAnos = anosOrdenados
+  const listaAnos = Object.keys(porAno).sort()
     .map(a => `<span style="display:inline-block;background:#e8f5e9;border-radius:4px;padding:2px 7px;margin:2px;font-size:11px;"><strong>${a}</strong>: ${porAno[a]}</span>`)
     .join('');
 
-  // Contar por tipo
+  // Por tipo
   const porTipo = {};
   const tipoEmoji = { frutifera:'🍎', medicinal:'💊', ornamental:'🌸', madeireira:'🪵', oportunista:'🌿' };
   const tipoLabel = { frutifera:'Frutífera', medicinal:'Medicinal', ornamental:'Ornamental', madeireira:'Madeireira', oportunista:'Oportunista' };
@@ -610,6 +631,21 @@ window.mostrarEstatisticas = function() {
     .map(t => `<span style="display:inline-block;background:#f0f0f0;border-radius:4px;padding:2px 7px;margin:2px;font-size:11px;">${tipoEmoji[t]||'🌱'} <strong>${tipoLabel[t]||t}</strong>: ${porTipo[t]}</span>`)
     .join('');
 
+  // Por grupo
+  const porGrupo = {};
+  todasAsPlantas.forEach(p => {
+    const g = p.grupo || 'N/I';
+    porGrupo[g] = (porGrupo[g] || 0) + 1;
+  });
+  const listaGrupos = Object.keys(porGrupo).sort()
+    .map(g => {
+      const cfg = grupoConfig[g];
+      const badge = cfg
+        ? `<span style="background:${cfg.bg};color:${cfg.cor};border-radius:4px;padding:2px 7px;margin:2px;font-size:11px;display:inline-block;">${cfg.emoji} <strong>${g}</strong>: ${porGrupo[g]}</span>`
+        : `<span style="background:#eee;border-radius:4px;padding:2px 7px;margin:2px;font-size:11px;display:inline-block;"><strong>${g}</strong>: ${porGrupo[g]}</span>`;
+      return badge;
+    }).join('');
+
   const stats = `
     <div style="text-align:left;padding:20px;min-width:300px;">
       <h3 style="margin-top:0;color:#2d5016;border-bottom:2px solid #4a7c2c;padding-bottom:10px;">
@@ -618,6 +654,10 @@ window.mostrarEstatisticas = function() {
       <div style="background:#f0f8ff;padding:10px;border-radius:5px;margin:10px 0;">
         <strong>🌿 Plantas Catalogadas</strong><br>
         Total: <strong>${marcadoresIndividuais.length}</strong> espécimes
+      </div>
+      <div style="background:#fffbf2;padding:10px;border-radius:5px;margin:10px 0;">
+        <strong>🧬 Plantas por Grupo Taxonômico</strong><br>
+        <div style="margin-top:6px;">${listaGrupos}</div>
       </div>
       <div style="background:#f0fff0;padding:10px;border-radius:5px;margin:10px 0;">
         <strong>📆 Coletas por Ano</strong><br>
@@ -659,4 +699,4 @@ map.on('click', function(e) {
 carregarPlantas();
 
 console.log('%c🌿 Mapa Botânico UFRA', 'font-size:20px;color:#2d5016;font-weight:bold;');
-console.log('🔍 Filtro de ano adicionado ao painel de pesquisa');
+console.log('🧬 Filtro de grupo taxonômico adicionado ao painel de pesquisa');
